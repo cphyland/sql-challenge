@@ -1,0 +1,132 @@
+CREATE TABLE "Employees" (
+    "emp_no" int   NOT NULL,
+    "emp_title_id" varchar   NOT NULL,
+    "birth_date" date   NOT NULL,
+    "first_name" varchar   NOT NULL,
+    "last_name" varchar   NOT NULL,
+    "sex" varchar   NOT NULL,
+    "hire_date" date   NOT NULL,
+    CONSTRAINT "pk_Employees" PRIMARY KEY (
+        "emp_no"
+     )
+);
+
+CREATE TABLE "Departments" (
+    "dept_no" varchar   NOT NULL,
+    "dept_name" varchar   NOT NULL,
+    CONSTRAINT "pk_Departments" PRIMARY KEY (
+        "dept_no"
+     )
+);
+
+CREATE TABLE "Dept_emp" (
+    "emp_no" int   NOT NULL,
+    "dept_name" varchar   NOT NULL
+);
+
+CREATE TABLE "Dept_Managers" (
+    "dept_no" varchar   NOT NULL,
+    "emp_no" int   NOT NULL
+);
+
+CREATE TABLE "Salaries" (
+    "emp_no" int   NOT NULL,
+    "salary" int   NOT NULL,
+    CONSTRAINT "pk_Salaries" PRIMARY KEY (
+        "emp_no"
+     )
+);
+
+CREATE TABLE "Titles" (
+    "title_id" varchar   NOT NULL,
+    "title" varchar   NOT NULL,
+    CONSTRAINT "pk_Titles" PRIMARY KEY (
+        "title_id"
+     )
+);
+
+ALTER TABLE "Employees" ADD CONSTRAINT "fk_Employees_emp_title_id" FOREIGN KEY("emp_title_id")
+REFERENCES "Titles" ("title_id");
+
+ALTER TABLE "Salaries" ADD CONSTRAINT "fk_Salaries_emp_no" FOREIGN KEY("emp_no")
+REFERENCES "Employees" ("emp_no");
+
+--data analysis
+--list the following details for each employee:
+--employee number, last name, first name, sex, and salary
+
+SELECT Employees.emp_no, Employees.last_name, Employees.sex, Salaries.salary
+FROM Employees
+INNER JOIN Salaries on Employees.emp_no=Salaries.emp_no;
+
+--Data Analysis 2:
+--List first name, last name, and hire date for employees who were hired in 1986
+SELECT Employees.first_name, Employees.last_name, Employees.hire_date
+FROM Employees
+WHERE hire_date >= '1/1/1986' and hire_date <= '12/31/1986';
+
+--Analysis 3
+--List the manager of each dept with the following info:
+--dept number, dept name, the mgrs employee nubmer, last name, frist name
+
+CREATE TABLE manager_data as
+SELECT Dept_Managers.emp_no, Dept_Managers.dept_no, Departments.dept_name
+FROM dept_managers
+INNER JOIN Departments on Dept_Managers.dept_no=Departments.dept_no;
+
+SELECT manager_data.dept_no, manager_data.dept_name, manager_data.emp_no, Employees.last_name, Employees.first_name
+FROM manager_data
+INNER JOIN Employees on Employees.emp_no=manager_data.emp_no;
+
+
+--Analysis 4
+--list dept of each employee with the following info:
+--employee number, last name, first name, and dept name
+CREATE TABLE employee_data as
+SELECT Departments.dept_name, Dept_emp.emp_no, Dept_emp.dept_no 
+FROM Dept_emps
+INNER JOIN departments on dept_emp.dept_no=departments.dept_no;
+
+SELECT DISTINCT  employee_data.emp_no, employees.last_name, employees.first_name, employee_info.dept_name
+FROM employee_info
+LEFT JOIN Employees on employee_data.emp_no=Employees.emp_no;
+
+--Analysis 5
+--list first name, last name, and sex for employees whose frist name is "Hercules" and last name begins with "B"
+SELECT first_name, last_name, sex
+FROM Employees
+WHERE first_name LIKE 'Hercules' and last_name LIKE 'B%';
+
+--Analysis 6
+--List all employees in the Sales Dept, including:
+--employee number, lsat nmae, first name, and dept number
+
+SELECT DISTINCT employee_data.emp_no, Employees.last_name, Employees.first_name, Employee_info.dept_name
+FROM employee_data
+INNER JOIN Employees on Employees.emp_no=employee_data.emp_no
+WHERE dept_name = 'Sales';
+
+
+--Analysis 7
+--list all the emp in the sales and deb depts
+--emplyee number, last name, first name, and dept name
+
+SELECT DISTINCT employee_data.emp_no, Employees.last_name, Employees.first_name, Employee_info.dept_name
+FROM employee_data
+INNER JOIN Employees on Employees.emp_no=employee_data.emp_no
+WHERE dept_name = 'Sales' or dept_name = 'Development';
+
+--analysis 8
+-- in descending order, list the frequency count of employee last name - how may employees share a last name
+
+SELECT last_name, 
+	count(last_name) as count
+FROM Employees
+GROUP BY last_name
+ORDER BY count DESC
+
+--thank god this is over.  
+--now to find where this file saved...
+--can't find it so have to keep making changes,  time is ticking
+--tick tock
+
